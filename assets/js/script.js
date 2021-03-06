@@ -5,6 +5,7 @@ var bodyEl = document.querySelector('body');
 var highScores = [];
 var timeLeft = 75; //in seconds
 const MAX_HS = 3; // maximum number of high score stored...
+const NUM_CHOICE = 4;
 var questions = [
     {
         question: "String, integer, boolean, and double. These are examples of a: ",
@@ -39,7 +40,7 @@ var questions = [
         ans: "Document Object Model"
     },
     {
-        question: "What is the time complexity of a merge sort?",
+        question: "What is the time complexity of merge sort?",
         a: "O(Logn)",
         b: "O(nLogn)",
         c: "O(2^n)",
@@ -175,11 +176,17 @@ var buttonHandler = function(event) {
 //else if incorrect take time away and say "wrong!" below the choices
 //if timer === 0 the game is over
 
-var createQuestionPage = function() {
+var createQuestionPage = function(event) {
     var h2El = document.createElement('h2');
-    //h2El.textContent = ;
-    h2El.className = 's-title';
+    h2El.textContent = questions[i].question;
+    h2El.className = 'question';
     mainEl.appendChild(h2El);
+
+    //create ul element
+    for (var i = 0; i < NUM_CHOICE; i++){
+        //li buttons for choices with i value for data-choice
+    }
+    
 };
 
 //create game over page
