@@ -63,9 +63,27 @@ function timer(timerEl) {
 };
 
 
-//create start page
 //this page will explain about he website and have a start button
 //once the start button is pressed, the timer starts
+var createStartMainEls = function(){
+    var h1El = document.createElement("h1");
+    h1El.textContent = "Code Quiz Challenge";
+    h1El.className = "s-title";
+    mainEl.appendChild(h1El);
+
+    var pEl = document.createElement("p");
+    pEl.textContent = "Try to answer the following code-related" +
+    " questions within the time limit. Keep in mind that incorrect" +
+    " answers will penalize your score/time by ten seconds!";
+    pEl.className = "s-p";
+    mainEl.appendChild(pEl);
+    
+    // create button element to start quiz and timer
+    var startQuizBtnEl = document.createElement("button");
+    startQuizBtnEl.textContent = "Start Quiz";
+    startQuizBtnEl.className = "sq-btn";
+    mainEl.appendChild(startQuizBtnEl);
+}
 
 //create question page(s)
 //requires array of questions with choices and answer
@@ -86,6 +104,7 @@ function timer(timerEl) {
  */
 function createStartPage() {
     createAsideElements();
+    createStartMainEls();
 };
 
 createStartPage();
