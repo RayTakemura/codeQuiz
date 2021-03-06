@@ -1,19 +1,61 @@
 //Global variables
 var bodyEl = document.querySelector('body');
-var asideEl = document.querySelector('aside');
-var mainEl = document.querySelector('main');
+// var asideEl = document.querySelector('aside');
+// var mainEl = document.querySelector('main');
 var highScores = [];
 var timeLeft = 75; //in seconds
 const MAX_HS = 3; // maximum number of high score stored...
+var questions = [
+    {
+        question: "String, integer, boolean, and double. These are examples of a: ",
+        a: "Pointer",
+        b: "Fruit",
+        c: "Dog",
+        d: "Data type",
+        ans: "Data type"
+    },
+    {
+        question: "The condition that goes through the while loop and if statements must return a(n): ",
+        a: "Library book",
+        b: "Boolean data type",
+        c: "Turtle",
+        d: "Object",
+        ans: "Boolean data type"
+    },
+    {
+        question: "To traverse each index of an array using JavaScript, you would use: ",
+        a: "Your finger",
+        b: "A donut",
+        c: "If statement",
+        d: "For loop",
+        ans: "For loop"
+    },
+    {
+        question: "DOM stands for: ",
+        a: "DOra and a Monkey",
+        b: "DOnkey kong and Mario",
+        c: "Document Object Model",
+        d: "Document Oriented Model",
+        ans: "Document Object Model"
+    },
+    {
+        question: "What is the time complexity of a merge sort?",
+        a: "O(Logn)",
+        b: "O(nLogn)",
+        c: "O(2^n)",
+        d: "O(n^2)",
+        ans: "O(nLogn)"
+    }
+]
 
 /**
  * Creates elements inside the aside section.
  * The created elements are: a high score alerting button and the timer.
  */
 var createAsideElements  = function() {
-    // var asideEl = document.createElement('aside');
-    // asideEl.className = 'flex';
-    // bodyEl.appendChild(asideEl);
+    var asideEl = document.createElement('aside');
+    asideEl.className = 'flex';
+    bodyEl.appendChild(asideEl);
 
     //create high score button that shows the high scores
     var highScoreBtnEl = document.createElement('button');
@@ -86,9 +128,9 @@ function timer(timerEl) {
  * of the page, description, and the start quiz button.
  */
 var createStartMainEls = function(){
-    // var mainEl = document.createElement('main');
-    // mainEl.className = 'flex';
-    // bodyEl.appendChild(mainEl);
+    var mainEl = document.createElement('main');
+    mainEl.className = 'flex';
+    bodyEl.appendChild(mainEl);
 
     var h1El = document.createElement('h1');
     h1El.textContent = "Code Quiz Challenge";
@@ -109,13 +151,17 @@ var createStartMainEls = function(){
     mainEl.appendChild(startQuizBtnEl);
 };
 
-var nextButtonHandler = function(event) {
-    // delete main
-    if (event.target.matches('.sq-btn')){
+var buttonHandler = function(event) {
+    
+    if (event.target.matches('.hs-btn')){
+        highScoreBtnHandler();
+    }
+    else if (event.target.matches('.sq-btn')){
+        // delete main
         //createQuestionPage();
         timer(document.querySelector('.timer'));
     } else if (event.target.matches('.choice')){
-
+        // delete main
     }
     
 };
@@ -151,5 +197,4 @@ function createStartPage() {
 
 createStartPage();
 
-asideEl.addEventListener('click', highScoreBtnHandler);
-//mainEl.addEventListener('click', )
+bodyEl.addEventListener('click', buttonHandler);
