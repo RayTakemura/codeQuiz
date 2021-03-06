@@ -1,0 +1,29 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --pink: rgb(192, 57, 181);
+    --purple: rgb(78, 0, 97);
+}
+
+.flex {
+    display: flex;
+}
+
+aside {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    font-size: 30px;
+    margin: 15px;
+}
+
+.hs-btn {
+    border: none;
+    padding: 0;
+    background: none;
+    font-size: 30px;
+    color: var(--pink);
+}
