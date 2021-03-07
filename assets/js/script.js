@@ -1,11 +1,10 @@
 //Global variables
 var bodyEl = document.querySelector('body');
-// var asideEl = document.querySelector('aside');
-// var mainEl = document.querySelector('main');
 var highScores = [];
 var timeLeft = 75; //in seconds
 const MAX_HS = 3; // maximum number of high score stored...
 const NUM_CHOICE = 4;
+var qCount = 0;
 var questions = [
     {
         question: "String, integer, boolean, and double. These are examples of a: ",
@@ -113,6 +112,7 @@ var highScoreBtnHandler = function() {
 function timer(timerEl) {
     var timeInterval = setInterval(function() {
         if( timeLeft < 0 ){
+            timeLeft = 0;
             clearInterval(timeInterval);
             //TO DO: insert function that changes the whole body section to the result screen
         } else {
@@ -148,45 +148,73 @@ var createStartMainEls = function(){
     // create button element to start quiz and timer
     var startQuizBtnEl = document.createElement('button');
     startQuizBtnEl.textContent = "Start Quiz";
-    startQuizBtnEl.className = 'sq-btn';
+    startQuizBtnEl.className = 'btn sq-btn';
     mainEl.appendChild(startQuizBtnEl);
-};
-
-var buttonHandler = function(event) {
-    
-    if (event.target.matches('.hs-btn')){
-        highScoreBtnHandler();
-    }
-    else if (event.target.matches('.sq-btn')){
-        // delete main
-        //createQuestionPage();
-        timer(document.querySelector('.timer'));
-    } else if (event.target.matches('.choice')){
-        // delete main
-    }
-    
 };
 
 //create question page(s)
 //requires array of questions with choices and answer
 //requires local storage for highscore.
-//for i < array.length then the game is over
 //once clicked on a choice, it checks if it's a correct answer
 //if correct, give point(s) and say "correct!" below the choices
 //else if incorrect take time away and say "wrong!" below the choices
 //if timer === 0 the game is over
 
-var createQuestionPage = function(event) {
+
+var createQuestionPage = function(correct) {
+    var mainEl = document.createElement('main');
+    bodyEl.appendChild(mainEl);
     var h2El = document.createElement('h2');
-    h2El.textContent = questions[i].question;
     h2El.className = 'question';
+    h2El.textContent = questions[qCount].question;
     mainEl.appendChild(h2El);
 
     //create ul element
+    var ulEl = document.createElement('ul');
+    //ulEl.className = 'choices';
+    //creates a list of buttons with choices
     for (var i = 0; i < NUM_CHOICE; i++){
-        //li buttons for choices with i value for data-choice
+        var liEl = document.createElement('li');
+        var btnEl = document.createElement('button');
+        btnEl.className = 'btn choice';
+        btnEl.setAttribute('data-choice-id', i);
+        if(i === 0){
+            btnEl.textContent = questions[qCount].a
+        } else if (i === 1){
+            btnEl.textContent = questions[qCount].b
+        } else if (i === 2) {
+            btnEl.textContent = questions[qCount].c
+        } else if (i === 3) {
+            btnEl.textContent = questions[qCount].d
+        }
+        liEl.appendChild(btnEl);
+        ulEl.appendChild(liEl);
     }
-    
+    mainEl.appendChild(ulEl);
+
+};
+
+var printResult = function(correct) {
+    if (qCount > 0) {
+        var h3El = document.createElement('h3');
+        h3El.className = 'result';
+        if (correct){
+            h3El.textContent = "Correct!";
+        } else {
+            h3El.textContent = "Wrong!";
+        }
+        document.querySelector('main').appendChild(h3El);
+        //delayDelete(document.querySelector('.result'));
+    } 
+};
+
+var checkAnswer = function (event){
+    var chosen = event.target.textContent;
+    if (chosen === questions[qCount].ans) {
+        return true;
+    }
+    timeLeft -= 10;
+    return false;
 };
 
 //create game over page
@@ -200,6 +228,35 @@ var createQuestionPage = function(event) {
 function createStartPage() {
     createAsideElements();
     createStartMainEls();
+};
+
+/**
+ * Handles all sorts of button clicks and calls functions according to the button
+ * @param {event} event the "click" event that happens when a button is clicked
+ */
+var buttonHandler = function(event) {
+    
+    if (event.target.matches('.hs-btn')){
+        highScoreBtnHandler();
+    }
+    else if (event.target.matches('.sq-btn')){
+        //console.log(event.target.textContent);
+        document.querySelector('main').remove();
+        createQuestionPage();
+        timer(document.querySelector('.timer'));
+    } else if (event.target.matches('.choice')){
+        document.querySelector('main').remove();
+        var correct = checkAnswer(event);
+        qCount++;
+        if (qCount < questions.length){
+            createQuestionPage();
+            printResult(correct);
+            
+        } else {
+            //createSubmitPage();
+        }
+    }
+    
 };
 
 createStartPage();
