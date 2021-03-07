@@ -62,9 +62,12 @@ main {
     text-align: center;
 }
 
+/* QUIZ PAGE */
+.quiz {
+    margin: 8% 10%;
+}
 
-
-/* QUESTION PAGE */
 ul {
     list-style-type: none;
+    margin: 10px 0;
 }

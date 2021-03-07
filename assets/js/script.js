@@ -48,6 +48,7 @@ var questions = [
     }
 ]
 
+
 /**
  * Creates elements inside the aside section.
  * The created elements are: a high score alerting button and the timer.
@@ -70,6 +71,7 @@ var createAsideElements  = function() {
     asideEl.appendChild(timerEl);
 };
 
+
 /**
  * Alerts user a list of high scores with user initials
  * @returns alert with "No high score!" if there is no high score saved in the localstorage
@@ -78,7 +80,7 @@ var highScoreBtnHandler = function() {
     //get high score from localstorage and use it to display on alert
     var highScore = localStorage.getItem('hs');
     if (!highScore) {
-        return alert("No high score!");
+        return alert(`No high score!`);
     }
     highScores = highScore.split(',');
 
@@ -104,9 +106,9 @@ var highScoreBtnHandler = function() {
     alert(hsMessage);
 };
 
+
 /**
  * Counts down the timer every second.
- * 
  * @param {document} timerEl The timer Element in the aside section
  */
 function timer(timerEl) {
@@ -114,6 +116,11 @@ function timer(timerEl) {
         if( timeLeft < 0 ){
             timeLeft = 0;
             clearInterval(timeInterval);
+            var mainEl = bodyEl.querySelector('main');
+            if (!mainEl){
+                mainEl.remove();
+            }
+            timeLeft = 75;
             //TO DO: insert function that changes the whole body section to the result screen
         } else {
             timerEl.textContent = "Time: " + timeLeft;
@@ -152,17 +159,72 @@ var createStartMainEls = function(){
     mainEl.appendChild(startQuizBtnEl);
 };
 
-//create question page(s)
-//requires array of questions with choices and answer
-//requires local storage for highscore.
-//once clicked on a choice, it checks if it's a correct answer
-//if correct, give point(s) and say "correct!" below the choices
-//else if incorrect take time away and say "wrong!" below the choices
-//if timer === 0 the game is over
+
+/**
+ * Prints 'Correct!' if the user gets the question correct.
+ * If the user gets the question wrong, this function will print 'Wrong!'
+ * @param {boolean} correct True if correct. If not correct, false.
+ */
+var printResult = function(correct) {
+    if (qCount > 0) {
+        var h3El = document.createElement('h3');
+        h3El.className = 'result';
+        if (correct){
+            h3El.textContent = "Correct!";
+        } else {
+            h3El.textContent = "Wrong!";
+        }
+        document.querySelector('main').appendChild(h3El);
+        delayDelete(document.querySelector('.result'));
+    } 
+};
 
 
-var createQuestionPage = function(correct) {
+/**
+ * Deletes the result of the answer after 2 seconds.
+ * @param {document} resultEl The h3 element with the text content 'Wrong' or 'Correct'.
+ */
+function delayDelete(resultEl) {
+    var deleteInterval = setInterval(function() {
+        if(resultEl){
+            resultEl.remove();
+        }
+        clearInterval(deleteInterval);
+    }, 2000);
+};
+
+
+/**
+ * Checks if the user chose the correct answer. If the user chose a wrong
+ * answer, then the time will be deducted by 10 units.
+ * @param {event} event The "click" event when an answer was chosen
+ * @returns True if the user clicked on the correct answer. Otherwise false.
+ */
+var checkAnswer = function (event){
+    var chosen = event.target.textContent;
+    if (chosen === questions[qCount].ans) {
+        return true;
+    }
+    timeLeft -= 10;
+    return false;
+};
+
+
+/**
+ * Sets up to create the start page of the code quiz website
+ */
+function createStartPage() {
+    createAsideElements();
+    createStartMainEls();
+};
+
+
+/**
+ * Creates the page that has the question and the multiple choice.
+ */
+var createQuestionPage = function() {
     var mainEl = document.createElement('main');
+    mainEl.className = 'quiz';
     bodyEl.appendChild(mainEl);
     var h2El = document.createElement('h2');
     h2El.className = 'question';
@@ -171,7 +233,6 @@ var createQuestionPage = function(correct) {
 
     //create ul element
     var ulEl = document.createElement('ul');
-    //ulEl.className = 'choices';
     //creates a list of buttons with choices
     for (var i = 0; i < NUM_CHOICE; i++){
         var liEl = document.createElement('li');
@@ -191,56 +252,18 @@ var createQuestionPage = function(correct) {
         ulEl.appendChild(liEl);
     }
     mainEl.appendChild(ulEl);
-
 };
 
-var printResult = function(correct) {
-    if (qCount > 0) {
-        var h3El = document.createElement('h3');
-        h3El.className = 'result';
-        if (correct){
-            h3El.textContent = "Correct!";
-        } else {
-            h3El.textContent = "Wrong!";
-        }
-        document.querySelector('main').appendChild(h3El);
-        //delayDelete(document.querySelector('.result'));
-    } 
-};
-
-var checkAnswer = function (event){
-    var chosen = event.target.textContent;
-    if (chosen === questions[qCount].ans) {
-        return true;
-    }
-    timeLeft -= 10;
-    return false;
-};
-
-//create game over page
-//present the user's score 
-//prompt for user initials
-//input box and submit button
-
-/**
- * Sets up to create the start page of the code quiz website
- */
-function createStartPage() {
-    createAsideElements();
-    createStartMainEls();
-};
 
 /**
  * Handles all sorts of button clicks and calls functions according to the button
  * @param {event} event the "click" event that happens when a button is clicked
  */
 var buttonHandler = function(event) {
-    
     if (event.target.matches('.hs-btn')){
         highScoreBtnHandler();
     }
     else if (event.target.matches('.sq-btn')){
-        //console.log(event.target.textContent);
         document.querySelector('main').remove();
         createQuestionPage();
         timer(document.querySelector('.timer'));
@@ -253,10 +276,10 @@ var buttonHandler = function(event) {
             printResult(correct);
             
         } else {
+            qCount = 0;
             //createSubmitPage();
         }
     }
-    
 };
 
 createStartPage();
