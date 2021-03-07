@@ -255,6 +255,30 @@ var createQuestionPage = function() {
 };
 
 
+var createSubmitPage = function (){
+    var mainEl = document.createElement('main');
+    mainEl.className = 'done';
+
+    var h2El = document.createElement('h2');
+    h2El.className = 'done-msg';
+    h2El.textContent = "All done!";
+    mainEl.appendChild(h2El);
+
+    var divEl = document.createElement('div');
+    divEl.className = 'form-wrap';
+
+    var spanEl = document.createElement('span');
+    spanEl.className = 'prompt-initials';
+    spanEl.textContent = "Enter initials";
+    var inputEl = document.createElement('input');
+    inputEl.setAttribute('type', 'text');
+    var buttonEl = document.createElement('button');
+    buttonEl.className = 'btn';
+    buttonEl.setAttribute('type', 'submit');
+    buttonEl.textContent = "Submit";
+    
+};
+
 /**
  * Handles all sorts of button clicks and calls functions according to the button
  * @param {event} event the "click" event that happens when a button is clicked
