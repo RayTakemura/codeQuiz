@@ -23,7 +23,6 @@ aside {
 
 main {
     flex-direction: column;
-    align-items: center;
     font-size: 30px;
     margin: 3%;
 }
@@ -53,6 +52,10 @@ main {
 }
 
 /* START PAGE */
+.start {
+    align-items: center;
+}
+
 .s-title, .s-p, .sq-btn {
     margin: 20px;
 }
@@ -67,7 +70,32 @@ main {
     margin: 8% 10%;
 }
 
+.result {
+    border-top: 2px solid;
+    padding-top: 5px;
+    color: gray;
+    font-size: 40px;
+}
+
 ul {
     list-style-type: none;
     margin: 10px 0;
+}
+
+/* DONE PAGE  */
+.done {
+    margin: 5% 30%;
+}
+
+.ini-form {
+    border-radius: 10px;
+    padding: 5px 15px;
+}
+
+/* HIGH SCORES PAGE */
+.hs {
+    margin: 5% 30%;
+}
+.scores {
+    background-color: var(--pink);
 }

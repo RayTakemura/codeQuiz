@@ -1,10 +1,16 @@
 //Global variables
 var bodyEl = document.querySelector('body');
-var highScores = [];
-var timeLeft = 75; //in seconds
+var highScores = "";
+var highScoreArr = [];
+var qCount = 0;
+var score = 0;
+var onGoing = true;
+const TIME_TOTAL = 75; //in seconds
+var timeLeft = TIME_TOTAL; 
+const SCORE_INC = 5; //The points for each question 
 const MAX_HS = 3; // maximum number of high score stored...
 const NUM_CHOICE = 4;
-var qCount = 0;
+
 var questions = [
     {
         question: "String, integer, boolean, and double. These are examples of a: ",
@@ -73,38 +79,50 @@ var createAsideElements  = function() {
 
 
 /**
- * Alerts user a list of high scores with user initials
- * @returns alert with "No high score!" if there is no high score saved in the localstorage
+ * Turns the highScoresArr to a string format. It retains the string and array with the number of MAX_HS scores. 
+ * @returns alert with "No high score!" if there is no high score saved in the localstorage, or string of score board.
  */
-var highScoreBtnHandler = function() {
-    //get high score from localstorage and use it to display on alert
-    var highScore = localStorage.getItem('hs');
-    if (!highScore) {
+var highScoreToStr = function() {
+    highScores = localStorage.getItem('quiz hs');
+    if (!highScores) {
         return alert(`No high score!`);
     }
-    highScores = highScore.split(',');
+    highScoresArr = highScores.split(',');
 
     // pick high scores
-    if (highScores.length > (MAX_HS * 2)){
-        var min = parseInt(highScores[1]);
-        for (var i = 0; i < highScores.length / 2; i++){
+    if (highScoresArr.length > (MAX_HS * 2)){
+        var min = parseInt(highScoresArr[1]);
+        for (var i = 0; i < highScoresArr.length / 2; i++){
             var scoreIndex = ( 2 * i ) + 1;
-            if (min < parseInt(highScores[scoreIndex])) {
-                min = parseInt(highScores[scoreIndex]);
+            if (min > parseInt(highScoresArr[scoreIndex])) {
+                min = parseInt(highScoresArr[scoreIndex]);
             }
         }
-        lowScoreIndex = highScores.indexOf(min.toString()) - 1;
-        highScores.splice(lowScoreIndex, 2);
+        lowScoreIndex = highScoresArr.indexOf(min.toString()) - 1;
+        highScoresArr.splice(lowScoreIndex, 2);
+
+        //update highScores string
+        highScores = "";
+        for (var i = 0; i < (highScoresArr.length / 2); i++){
+            var initial = (2 * i);
+            var scoreIndex = (2 * i) + 1;
+            if (i === 0){
+                highScores = highScoresArr[initial] + ',' + highScoresArr[scoreIndex];
+            } else {
+                highScores = highScores + ',' + highScoresArr[initial] + ',' + highScoresArr[scoreIndex];
+            }
+        }
+        localStorage.setItem('quiz hs', highScores);
     }
-    // alert the high scores
-    var hsMessage = "";
-    for (var i = 0; i < highScores.length / 2; i++){
+    // concactenate the high scores
+    var hsStr = "";
+    for (var i = 0; i < highScoresArr.length / 2; i++){
         var initials = 2 * i;
         var score = initials + 1;
-        hsMessage += highScores[initials] + ":   " + highScores[score] + "\n";
+        hsStr += highScoresArr[initials] + ":   " + highScoresArr[score] + "\n";
     }
-    alert(hsMessage);
-};
+    return hsStr;
+}
 
 
 /**
@@ -113,15 +131,13 @@ var highScoreBtnHandler = function() {
  */
 function timer(timerEl) {
     var timeInterval = setInterval(function() {
-        if( timeLeft < 0 ){
-            timeLeft = 0;
+        if( timeLeft < 0 || !onGoing ){
             clearInterval(timeInterval);
             var mainEl = bodyEl.querySelector('main');
-            if (!mainEl){
+            if (mainEl){
                 mainEl.remove();
+                createSubmitPage();
             }
-            timeLeft = 75;
-            //TO DO: insert function that changes the whole body section to the result screen
         } else {
             timerEl.textContent = "Time: " + timeLeft;
             timeLeft--;
@@ -137,7 +153,7 @@ function timer(timerEl) {
  */
 var createStartMainEls = function(){
     var mainEl = document.createElement('main');
-    mainEl.className = 'flex';
+    mainEl.className = 'flex start';
     bodyEl.appendChild(mainEl);
 
     var h1El = document.createElement('h1');
@@ -203,10 +219,21 @@ function delayDelete(resultEl) {
 var checkAnswer = function (event){
     var chosen = event.target.textContent;
     if (chosen === questions[qCount].ans) {
+        score += 5;
         return true;
     }
     timeLeft -= 10;
     return false;
+};
+
+/**
+ * Reset the global variable.
+ */
+var resetVars = function (){
+    qCount = 0;
+    score = 0;
+    onGoing = true;
+    timeLeft = TIME_TOTAL;
 };
 
 
@@ -257,37 +284,78 @@ var createQuestionPage = function() {
 
 var createSubmitPage = function (){
     var mainEl = document.createElement('main');
-    mainEl.className = 'done';
+    mainEl.className = 'flex done';
 
     var h2El = document.createElement('h2');
     h2El.className = 'done-msg';
     h2El.textContent = "All done!";
     mainEl.appendChild(h2El);
 
-    var divEl = document.createElement('div');
-    divEl.className = 'form-wrap';
+    var scoreEl = document.createElement('span');
+    scoreEl.className = 'score';
+    scoreEl.textContent = "Your final score is " + score + ".";
+    mainEl.appendChild(scoreEl);
 
+    var wrapperEl = document.createElement('div');
+    wrapperEl.className = 'form-wrap';
+    
     var spanEl = document.createElement('span');
     spanEl.className = 'prompt-initials';
-    spanEl.textContent = "Enter initials";
+    spanEl.textContent = "Enter initials: ";
     var inputEl = document.createElement('input');
-    inputEl.setAttribute('type', 'text');
+    inputEl.className = 'ini-form';
     var buttonEl = document.createElement('button');
-    buttonEl.className = 'btn';
-    buttonEl.setAttribute('type', 'submit');
+    buttonEl.className = 'btn init-btn';
     buttonEl.textContent = "Submit";
-    
+    wrapperEl.appendChild(spanEl);
+    wrapperEl.appendChild(inputEl);
+    wrapperEl.appendChild(buttonEl);
+    mainEl.appendChild(wrapperEl);
+
+    bodyEl.appendChild(mainEl);
+};
+
+var createHSPage = function() {
+    var mainEl = document.createElement('main');
+    mainEl.className = 'flex hs';
+
+    var h2El = document.createElement('h2');
+    h2El.className = 'hs-msg';
+    h2El.textContent = "High scores";
+    mainEl.appendChild(h2El);
+
+    var spanEl = document.createElement('span');
+    spanEl.className = 'scores';
+    spanEl.textContent = highScoreToStr();
+    mainEl.appendChild(spanEl);
+
+    var wrapperEl = document.createElement('div');
+    wrapperEl.className = 'flex wrapper';
+    var goBackBtn = document.createElement('button');
+    goBackBtn.className = 'btn go-back';
+    goBackBtn.textContent = "Go back";
+    var clearBtn = document.createElement('button');
+    clearBtn.className = 'btn clear';
+    clearBtn.textContent = "Clear high scores";
+    wrapperEl.appendChild(goBackBtn);
+    wrapperEl.appendChild(clearBtn);
+    mainEl.appendChild(wrapperEl);
+
+    bodyEl.appendChild(mainEl);
+
 };
 
 /**
- * Handles all sorts of button clicks and calls functions according to the button
+ * Handles all button clicks, then calls functions according to the button.
  * @param {event} event the "click" event that happens when a button is clicked
  */
 var buttonHandler = function(event) {
     if (event.target.matches('.hs-btn')){
-        highScoreBtnHandler();
-    }
-    else if (event.target.matches('.sq-btn')){
+        var msg = highScoreToStr();
+        if (highScores || highScores !== ''){
+            alert(msg);
+        }
+    } else if (event.target.matches('.sq-btn')){
         document.querySelector('main').remove();
         createQuestionPage();
         timer(document.querySelector('.timer'));
@@ -297,15 +365,44 @@ var buttonHandler = function(event) {
         qCount++;
         if (qCount < questions.length){
             createQuestionPage();
-            printResult(correct);
-            
+            printResult(correct);            
         } else {
-            qCount = 0;
-            //createSubmitPage();
+            onGoing = false;
+            createSubmitPage();
+            printResult(correct);
         }
+    } else if (event.target.matches('.init-btn')){
+        event.preventDefault();
+        var initials = document.querySelector('.ini-form').value;
+        if (initials === '' || typeof initials !== 'string'){
+            alert("Please enter valid initials");
+            return;
+        }
+       
+        highScores = localStorage.getItem('quiz hs')
+        
+        if (!highScores){
+            localStorage.setItem('quiz hs', initials + ',' + score);
+        } else {
+            localStorage.setItem('quiz hs', highScores + ',' + initials + ',' + score);
+        }
+        document.querySelector('main').remove();
+        document.querySelector('aside').remove();
+        createHSPage();
+    } else if (event.target.matches('.go-back')){
+        document.querySelector('main').remove();
+        resetVars();
+        createStartPage();
+    } else if (event.target.matches('.clear')){
+        var scoreBoard = document.querySelector('.scores');
+        scoreBoard.remove();
+        highScores = '';
+        localStorage.setItem('quiz hs', '');
     }
 };
 
 createStartPage();
 
 bodyEl.addEventListener('click', buttonHandler);
+
+//bodyEl.addEventListener('submit', )
